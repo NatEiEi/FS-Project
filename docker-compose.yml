@@ -1,0 +1,119 @@
+services:
+  mysqldb:
+    container_name: mysqlcontainer
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    volumes:
+      - ./dbinit/init.sql:/docker-entrypoint-initdb.d/0_init.sql
+      - mysqldb:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    expose:
+      - 3306
+    environment:
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: example
+      MYSQL_ROOT_PASSWORD: example
+      SERVICE_TAGS: prod
+      SERVICE_NAME: mysqldb
+    networks:
+      - internalnet
+    
+  nodeapp:
+    container_name: nodecontainer
+    build:
+      context: ./node
+      dockerfile: ./node.Dockerfile
+    image: nodeapp:latest
+    ports:
+      - "5000:5000"
+    expose:
+      - 5000
+    depends_on:
+      - mysqldb
+    environment:
+      DB_HOST: mysqldb
+      DB_USER: admin
+      DB_PASSWORD: example
+      DB_ROOT_PASSWORD: example
+      DB_PORT: 3306
+      SERVICE_PORT: 5000
+    networks:
+      - internalnet
+  
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    depends_on:
+      - mysqldb
+    environment:
+      PMA_HOST: mysqldb
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: example
+      MYSQL_ROOT_PASSWORD: example
+    ports:
+      - 8888:80
+    networks:
+      - internalnet
+
+  phpapp:
+    container_name: phpcontainer
+    build:
+      context: ./shop
+      dockerfile: ./php.Dockerfile
+    image: phpapp:latest
+    restart: always
+    ports:
+      - "8000:80"
+    expose:
+      - 8000
+    depends_on:
+      - mysqldb
+    environment:
+      DB_HOST: mysqldb
+      DB_USER: admin
+      DB_PASSWORD: example
+      DB_ROOT_PASSWORD: example
+      DB_PORT: 3306
+    networks:
+      - internalnet
+
+  reactapp:
+    build:
+      context: ./react
+      dockerfile: ./react.Dockerfile
+    container_name: reactapp
+    working_dir: /usr/src/app
+    networks: 
+      - internalnet
+    volumes: 
+      - ./react:/usr/src/app
+      - /usr/src/app/node_modules
+    tty: true
+    ports: 
+      - "3000:3000"
+    command: npm run start
+
+  # nginx:
+  #   build:
+  #     context: ./nginx
+  #     dockerfile: ./nginx.Dockerfile
+  #   container_name: nginx
+  #   restart: always
+  #   tty: true
+  #   ports: 
+  #     - "80:80"
+  #   networks: 
+  #     - internalnet
+  #   depends_on:
+  #      - reactapp
+  #      - nodeapp
+  #      - phpapp
+
+networks:
+  internalnet:
+    driver: bridge
+
+volumes:
+  mysqldb:

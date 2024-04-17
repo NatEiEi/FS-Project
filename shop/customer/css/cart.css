@@ -1,0 +1,59 @@
+body {
+    background-color: #f4f4f4;
+}
+.container {
+    width: 50%;
+    margin: 30px auto;
+    padding: 20px ;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.item img {
+    max-width: 100px;
+    max-height: 100px;
+    margin-right: 20px;
+}
+.item .name {
+    flex-grow: 1;
+}
+.item .qty {
+    padding: 0px 60px;
+}
+.btn_Purchase{
+    width: 100%;
+    height: 40px;
+    color: white;
+    background-color: rgb(51,136,235);
+}
+.price {
+    text-align: end;
+}
+.slip_image {
+    width: 50%;
+    height: 50%;
+}
+
+
+h1 {
+    text-align: center;
+}
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+li {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+.btn_disabled {
+    background-color: gray; /* เปลี่ยนสีพื้นหลังเป็นสีเทา */
+    color: #ccc; /* เปลี่ยนสีตัวอักษรเป็นสีเทาเข้ม */
+    cursor: not-allowed; /* เปลี่ยนรูปแบบ cursor เป็น icon แสดงว่าไม่สามารถกดได้ */
+}

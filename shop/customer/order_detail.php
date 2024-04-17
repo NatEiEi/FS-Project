@@ -1,0 +1,280 @@
+<?php 
+    require_once __DIR__ . '/db.php'; 
+    include_once __DIR__ . '/navbar.php';
+  
+    $OrderID = $_GET['OrderID'];
+    $OrderQuery = "SELECT * FROM `order` o, order_status os WHERE OrderID = '$OrderID' AND o.Status = os.StatusID";
+    $statement = $pdo->prepare($OrderQuery);
+    $statement->execute();
+    if ($statement->rowCount() > 0) {
+        $orders = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $orderInfo = $orders[0];
+    }
+    
+    $AddressQuery = "SELECT Username , Name , Tel , Detail , Province ,Amphure , District , Zip , Type
+                    FROM address a, addresslist al
+                    WHERE a.AddressID = al.AddressID AND al.OrderID = '$OrderID'";
+    $statement = $pdo->prepare($AddressQuery);
+    $statement->execute();
+    if ($statement->rowCount() > 0) {
+        $addressLists = $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    $ProductQuery = "SELECT p.ProductID , ProductName , pl.Qty , PricePerUnit 
+                    FROM product p, productlist pl
+                    WHERE p.ProductID = pl.ProductID AND pl.OrderID = '$OrderID'";
+    $statement = $pdo->prepare($ProductQuery);
+    $statement->execute();
+    if ($statement->rowCount() > 0) {
+        $products = $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    $OrderQuery = "SELECT * FROM order_shipping_detail WHERE OrderID = '$OrderID'";
+    $statement = $pdo->prepare($OrderQuery);
+    $statement->execute();
+    if ($statement->rowCount() > 0) {
+        $orders = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $orderInfo_ship = $orders[0];
+    }
+
+    //customer and invoice details
+    $infoBuy = [];
+    $infoBill = [];
+    $infoShip = [];
+
+    foreach ($addressLists as $row) {
+        if($row['Type'] == "Buy") {
+            $infoBuy =[
+                "Name" => $row['Name'],
+                "Tel" => $row['Tel'],
+                "Detail" => $row['Detail'],
+                "Province" =>  $row['Province'], 
+                "Amphure" => $row['Amphure'], 
+                "District" => $row['District'], 
+                "Zip" => $row['Zip']
+            ];
+        }
+        
+        if($row['Type'] == "Bill"){
+            $infoBill = [
+                "Name" => $row['Name'],
+                "Tel" => $row['Tel'],
+                "Detail" => $row['Detail'],
+                "Province" =>  $row['Province'], 
+                "Amphure" => $row['Amphure'], 
+                "District" => $row['District'], 
+                "Zip" => $row['Zip']
+            ];
+        }
+        if($row['Type'] == "Ship"){
+            $infoShip = [
+                "Name" => $row['Name'],
+                "Tel" => $row['Tel'],
+                "Detail" => $row['Detail'],
+                "Province" =>  $row['Province'], 
+                "Amphure" => $row['Amphure'], 
+                "District" => $row['District'], 
+                "Zip" => $row['Zip']
+            ];
+        }
+    }
+    $totalPrice = 0;
+
+    // ถ้าสถานะเป็นขอคืนเงิน หรือคืนเงินแล้ว
+
+    $query = "SELECT * FROM order_refund_detail WHERE OrderID = '$OrderID'";
+    $statement = $pdo->prepare($query);
+    $statement->execute();
+    if ($statement->rowCount() > 0) {
+        $orders = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $orderInfo_refund = $orders[0];
+    }
+    
+
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="css/cart.css">
+</head>
+<body>
+<div class="container">
+    <h1>รายการสั่งซื้อ</h1>
+    <ul>
+        <p>หมายเลขรายการสั่งซื้อ : <?= $OrderID ?></p>
+        <p>สถานะรายการสั่งซื้อ : <?= $orderInfo['Status_TH'] ?></p>
+        <p>สั่งซื้อวันที่ : <?= date('d F Y H:i:s', strtotime($orderInfo['Date'])) ?></p>
+
+        <?php 
+            if($orderInfo['Payment'] == "QRCode"){
+                $PaymentMethod = "ชำระผ่าน QR Code PromtPay";
+            } else if($orderInfo['Payment'] == "CashOnDelivery"){
+                $PaymentMethod = "ชำระเงินปลายทาง";
+            }
+        ?>
+        <p>วิธีชำระเงิน : <?= $PaymentMethod ?></p>
+    </ul>
+    <ul>
+        <p>รายการสินค้า : <?= count($products) ?> รายการ</p>
+        <?php if(isset($products)): ?>
+            <?php foreach($products as $product): 
+                $fileName = $product['ProductID'];
+                $filePath = "../images/product/" . $fileName . "-1" . ".jpg"; 
+
+
+                if (file_exists($filePath)) {
+                } else {
+                    $filePath = "../images/boss_Dog.jpg";
+                }
+                $price = $product['PricePerUnit'] * $product['Qty'];
+                $totalPrice = $totalPrice + $price;
+        ?>  
+            <li class="item">
+                <img src="<?= $filePath ?>" alt="Product Image">
+                <div class="name"><?= $product['ProductName'] ?></div>
+                <div class="qty">จำนวน : <?= $product['Qty'] ?></div>
+                <div class="price">ราคา : <?= $price ?> บาท</div>
+            </li>
+            <?php endforeach; ?>
+        <?php endif ?>
+    </ul>
+
+
+    <!-- <p class="price">Total Price :  <?= $totalPrice ?> THB</p> -->
+    <p class="price">ราคารวม : <?= $orderInfo['SubTotalPrice']?> บาท</p>
+    <p class="price">ภาษีมูลค่าเพิ่ม (7%) : <?= $orderInfo['Vat']?> บาท</p>
+    <p class="price">ค่าจัดส่ง : <?= $orderInfo['ShippingCost']?> บาท</p>
+    <hr style="width: 25%; float: right; clear: both;"><br>
+    <p class="price">ราคารวมสุทธิ : <?= $orderInfo['TotalPrice']?> บาท</p>
+    
+    <!-- <p>ประเภทการชำระเงิน : <?= $Payment ?></p> -->
+    <hr>
+    <p>ที่อยู่</p>
+    <p>ที่อยู่ผู้ซื้อ</p>
+    <p><?= $infoBuy["Name"] ?> <?= $infoBuy["Tel"] ?> , <?= $infoBuy["Detail"] ?> <?= $infoBuy["District"] ?> <?= $infoBuy["Amphure"] ?> <?= $infoBuy["Province"] ?>   <?= $infoBuy["Zip"] ?></p>
+    
+    <p>ที่อยู่ออกบิล</p>
+    <p><?= $infoBill["Name"] ?> <?= $infoBill["Tel"] ?> , <?= $infoBill["Detail"] ?> <?= $infoBill["District"] ?> <?= $infoBill["Amphure"] ?> <?= $infoBill["Province"] ?>   <?= $infoBill["Zip"] ?></p>
+
+    <p>ที่อยู่จัดส่ง</p>
+    <p><?= $infoShip["Name"] ?> <?= $infoShip["Tel"] ?> , <?= $infoShip["Detail"] ?> <?= $infoShip["District"] ?> <?= $infoShip["Amphure"] ?> <?= $infoShip["Province"] ?>   <?= $infoShip["Zip"] ?></p>
+    
+    <p>บริษัทจัดส่ง : <?= $orderInfo_ship['Shipper']?></p>
+    <?php if($orderInfo_ship['TrackingNumber'] != NULL): ?>
+        <p>หมายเลขติดตามพัสดุ : <?= $orderInfo_ship['TrackingNumber']?></p>
+    <?php endif ?>
+    
+    <?php 
+        $slipPath = "../images/slip/" . $OrderID . ".jpg" ;
+    ?>
+    <?php if(file_exists($slipPath)): ?>
+        <p>หลักฐานการชำระเงิน : </p>
+        <img src="<?= $slipPath ?>" class="slip_image" alt="slip" style="max-width:50%;max-height:50%;">
+        <hr>
+    <?php endif ?>
+    
+    <?php if(isset($orderInfo_refund)): ?>
+        <?php if(count($orderInfo_refund) > 0): ?>
+            <p>การร้องขอคืนเงิน</p>
+            <?php if($orderInfo_refund['refund_status'] != ""): ?>
+                <p>สถานะการร้องขอคืนเงิน : <?= $orderInfo_refund['refund_status']?></p>
+                <?php else: ?>
+                <p>สถานะการร้องขอคืนเงิน : รอดำเนินการ</p>
+            <?php endif ?>
+                
+            
+            <p>เหตุผลในการขอคืนเงิน : <?= $orderInfo_refund['reason']?></p>
+            <p>ร้องขอคืนเงินเมื่อ : <?= date('d F Y H:i:s', strtotime($orderInfo_refund['submitted_at'])) ?> </p>
+            <?php if($orderInfo_refund['received_at'] != "0000-00-00 00:00:00"): ?>
+                <p>ดำเนินการเมื่อ : <?= date('d F Y H:i:s', strtotime($orderInfo_refund['received_at'])) ?></p>
+            <?php endif ?>
+            <p>ช่องทางรับเงินคืน :</p>
+            <p>ชื่อธนาคาร : <?= $orderInfo_refund['bank']?></p>
+            <p>เลขบัญชี : <?= $orderInfo_refund['account_number']?></p>
+            <p>ชื่อบัญชี : <?= $orderInfo_refund['account_name']?></p>
+            <?php 
+                $slip_refundPath = "../images/refund_slip/refund_slip_" . $OrderID . ".jpg" ;
+            ?>
+            <?php if(file_exists($slip_refundPath)): ?>
+                <p>หลักฐานการคืนเงินให้ลูกค้า : </p>
+                <img src="<?= $slip_refundPath ?>" class="slip_image" alt="slip" style="max-width:50%;max-height:50%;">
+                
+            <?php endif ?>
+            <hr>
+        <?php endif ?>
+    <?php endif ?>
+
+
+
+
+
+    
+    
+    <!-- 
+    แบบโอนจ่าย 		แต่ยังไม่ได้จ่ายตัง ลูกค้า ยกเลิกทันทีได้เลย
+		จ่ายตังแล้ว แต่ยังไม่ส่ง ลูกค้าต้องกรอกแบบฟอร์มยืนขอคืนเงิน
+		จ่ายตังแล้ว ส่งแล้ว ลูกค้าต้องกรอกแบบฟอร์มยืนขอคืนเงิน คืนของ
+
+    แบบจ่ายปลายทาง 	ถ้าส่งแล้ว ยกเลิกที่ปลายทาง ลูกค้ายกเลิกในเว็ปไม่ได้ 
+	    ถ้ายังไม่ได้ส่ง ยกเลิกทันทีได้ 
+    -->
+
+    
+    <?php if($orderInfo['Status'] == "10" && $orderInfo['Payment'] == "QRCode"): ?>
+        <a href="transfer_slip.php?OrderID=<?= $OrderID ?>">
+            <input type="button" class="btn_Purchase" value="ส่งหลักฐานการชำระเงิน">
+        </a>
+        <br><br>
+    <?php endif ?>
+    
+    <?php if($orderInfo['Status'] == "10" 
+            || ($orderInfo['Status'] == "30" 
+            && $orderInfo['Payment'] == "CashOnDelivery") ): ?>
+        <a href="update_status_to_cancel.php?OrderID=<?= $OrderID ?>" onclick="return confirmCancel()">
+            <input type="button" class="btn_Purchase" value="ยกเลิกรายการสั่งซื้อ">
+        </a>
+    <?php endif ?>
+
+    <?php if(($orderInfo['Status'] == "20" || $orderInfo['Status'] == "30") 
+            && $orderInfo['Payment'] == "QRCode" 
+            && !isset($orderInfo_refund)): ?>
+        <a href="refund.php?OrderID=<?= $OrderID ?>" onclick="return confirmRefund()">
+            <input type="button" class="btn_Purchase" value="ขอคืนเงิน">
+        </a>
+    <?php endif ?>
+    <hr>
+    <center><p>พิมพ์เอกสาร</p></center>
+    <a href="../report/Invoice.php?OrderID=<?= $OrderID ?>"><input type="button" class="btn_Purchase" value="พิมพ์ใบแจ้งหนี้"></a>
+    <hr>
+
+    <?php if(($orderInfo['Status'] == "30" || $orderInfo['Status'] == "40" || $orderInfo['Status'] == "50") 
+            && $orderInfo['Payment'] == "QRCode" 
+            && !isset($orderInfo_refund)): ?>
+        <a href="../report/E-receipt.php?OrderID=<?= $OrderID ?>"><input type="button" class="btn_Purchase" value="พิมพ์ใบเสร็จ"></a>
+    <?php endif ?>
+
+</body>
+
+
+<script>
+    function confirmCancel() {
+        // แสดง popup confirm และรับค่าที่ผู้ใช้ตอบ
+        var confirmation = confirm("คุณต้องการที่จะยกเลิกรายการสั่งซื้อใช่หรือไม่?");
+        // หากผู้ใช้กด OK ใน popup confirm จะเปิดลิงก์
+        return confirmation;
+    }
+    function confirmRefund() {
+        // แสดง popup confirm และรับค่าที่ผู้ใช้ตอบ
+        var confirmation = confirm("คุณต้องการที่จะขอคืนเงินใช่หรือไม่?");
+        // หากผู้ใช้กด OK ใน popup confirm จะเปิดลิงก์
+        return confirmation;
+    }
+</script>
+
+
+
+</html>
+
+

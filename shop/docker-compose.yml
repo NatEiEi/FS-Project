@@ -1,0 +1,20 @@
+services:
+  php:
+    container_name: phpcontainer
+    build: .
+    image: php:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - mysqldb
+    environment:
+      DB_HOST: mysqldb
+      DB_USER: admin
+      DB_PASSWORD: example
+      DB_PORT: 3306
+    networks:
+      - internalnet
+
+networks:
+  internalnet:
+    external: true

@@ -1,0 +1,40 @@
+/* กำหนดสไตล์ให้กับคอนเทนเนอร์หลัก */
+.container {
+    display: flex; /* ใช้ Flexbox */
+    justify-content: space-between; /* จัดวางส่วนซ้ายและขวาตามช่องว่าง */
+    align-items: flex-start; /* จัดวางองค์ประกอบในแนวด้านบนของคอนเทนเนอร์ */
+    padding: 0px 15%;
+  }
+  
+  /* กำหนดสไตล์ให้กับส่วนซ้าย */
+  .left-section {
+    padding: 30px 0px;
+    width: 40%; /* กำหนดความกว้างส่วนซ้าย */
+  }
+  
+  /* กำหนดสไตล์ให้กับส่วนขวา */
+  .right-section {
+    padding: 50px 0px;
+    width: 60%; /* กำหนดความกว้างส่วนขวา */
+  }
+  
+  /* กำหนดสไตล์ให้กับภาพที่เลือกจาก input file */
+  #imagePreview img {
+    max-width: 100%;
+    max-height: 300px; /* กำหนดความสูงสูงสุดของภาพ */
+    margin-top: 10px;
+  }
+  input[type="submit"] {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 100%;
+  }
