@@ -65,9 +65,9 @@ services:
     image: phpapp:latest
     restart: always
     ports:
-      - "80:80"
+      - "8000:80"
     expose:
-      - 80
+      - 8000
     depends_on:
       - mysqldb
     environment:
