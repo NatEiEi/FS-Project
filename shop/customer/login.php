@@ -20,16 +20,21 @@
             
             $jwt = new JWT_Handler();
             $jwt->encode($Username, $FName, $LName); 
+            $escaped_Username = htmlspecialchars($Username, ENT_QUOTES, 'UTF-8');
 
+            // if (isset($_COOKIE['JWT'])){
+            //     echo $jwt->decode();
+            // }
+        
                 
             date_default_timezone_set('Asia/Bangkok');
-            $query = "INSERT INTO log (Date, Username, Action) VALUES (NOW(), '$Username', 'Login')";
+            $query = "INSERT INTO log (Date, Username, Action) VALUES (NOW(), ?, 'Login')";
             $statement = $pdo->prepare($query);
-            $statement->execute();
+            $statement->execute([$escaped_Username]);
             
-            $query = "SELECT * FROM cart WHERE Username = '$Username'";
+            $query = "SELECT * FROM cart WHERE Username = ?";
             $statement = $pdo->prepare($query);
-            $statement->execute();
+            $statement->execute([$Username]);
             if($statement->rowCount() > 0) {
                 $products = $statement->fetchAll(PDO::FETCH_ASSOC);
                 $_SESSION['CartCount'] = count($products);
@@ -39,23 +44,21 @@
 
             
             // echo "Login Success.";
-            // header('Location: Home.php');
-            // exit();
-            echo "<script>alert('เข้าสู่ระบบสำเร็จ'); window.location='Home.php';</script>";
+            header('Location: Home.php');
+            exit();
         }
         else {
             // echo "Login Failed...";
-            // echo "Username or Password Is not correct.";
-            echo "<script>alert('Username or Password Is not correct.');</script>";
+            echo "Username or Password Is not correct.";
         }
     }
 ?>
 
 <?php
 
-$ClientId = "430873183011-lbpoqi8ib05ncuahnfbn3e53jl3tealf.apps.googleusercontent.com";
-$ClientSecret = "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";
-$RedirectUri = "http://localhost/Shop/customer/login.php";
+$ClientId = "430873183011-8k7gi5hrjd73ns8odtfmra3bps9i0khf.apps.googleusercontent.com";
+$ClientSecret = "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";
+$RedirectUri = "http://www.techshops.space:8000/customer/login.php";
 
 
 $google_client = new Google_Client();
@@ -89,17 +92,22 @@ if(isset($_GET["code"]))
         $statement->execute([$email]);
 
         if($statement->rowCount() == 0) {
+            $escaped_Email = htmlspecialchars($data['email'], ENT_QUOTES, 'UTF-8');
+            $escaped_FName = htmlspecialchars($data['given_name'], ENT_QUOTES, 'UTF-8');
+            $escaped_LName = htmlspecialchars($data['family_name'], ENT_QUOTES, 'UTF-8');
+            $escaped_Username = htmlspecialchars($data['email'], ENT_QUOTES, 'UTF-8');
         
             $query =    "INSERT INTO customer (Email , FName , LName ,Username  ) 
-                        VALUES ( ? , ? , ? , ?);";
+                        VALUES ( ? , ? , ? ,?);";
             $statement = $pdo->prepare($query);
-            $statement->execute([$data['email'],$data['given_name'], $data['family_name'],$data['email']]);
+            // $statement->execute([$data['email'],$data['given_name'], $data['family_name'],$data['email']]);
+            $statement->execute([$escaped_Email,$escaped_FName, $escaped_LName, $escaped_Username]);
+
         } 
         $jwt = new JWT_Handler();
         $jwt->encode($data['email'], $data['given_name'], $data['family_name']); 
         $secret_key = "your_secret_key"; 
-        // header('Location: Home.php');
-        echo "<script>alert('เข้าสู่ระบบสำเร็จ'); window.location='Home.php';</script>";
+        header('Location: Home.php');
     }
 }
 ?>
@@ -137,6 +145,7 @@ One account. All of Google.
 </div>
 <div id="p" class="form-group">
   <input id="password" class="form-control" spellcheck=false name="password" type="password" size="18" alt="login" required="">
+  
   <span class="form-highlight"></span>
   <span class="form-bar"></span>
   <label for="password" class="float-label">Password</label>
@@ -151,17 +160,14 @@ One account. All of Google.
   </errorp>
 </div>
 <br>
-<button class="btn_submit" type="button" id="submit" ripple>Sign in</button>
+<button class="btn_submit" type="submit" id="submit" ripple>Sign in</button>
 
 </form>
 
 
 <form class="form-login" id="google-login-form">
     <hr><br>
-    <button class="btn_google" type="button" id="google-login-btn" ripple>
-        <img src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png">
-        Sign in with Google 
-    </button>
+    <button class="btn_submit" type="button" id="google-login-btn" ripple>Sign in with Google</button>
 </form>
 
 <footer><a href="register.php">Register</a></footer>

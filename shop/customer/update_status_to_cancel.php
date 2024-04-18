@@ -31,8 +31,10 @@
     $statement = $pdo->prepare($query);
     $statement->execute();
     
-    header('Location: order_detail.php?OrderID=' . $OrderID);
+    // header('Location: order_detail.php?OrderID=' . $OrderID);
+    // exit;
     echo "<script>alert('ยกเลิกรายการสั่งซื้อสำเร็จ'); window.location='order_detail.php?OrderID=$OrderID';</script>";
+    exit;
  
 ?>
 

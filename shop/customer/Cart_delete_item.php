@@ -27,5 +27,6 @@
 
     echo "ลบสำเร็จเรียบร้อยแล้ว...";
     header("Location: Cart.php");
+    exit;
 
 ?>

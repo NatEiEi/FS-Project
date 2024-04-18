@@ -1,7 +1,7 @@
 <?php
-    $host="host.docker.internal"; 
+    $host="mysqldb"; 
     $user="root"; 
-    $password=""; 
+    $password="example"; 
     $db="shopdb"; 
 
     try {

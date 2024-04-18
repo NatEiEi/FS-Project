@@ -10,7 +10,7 @@ const port = 5000;
 app.use(cors());
 
 const connection = mysql.createConnection({
-  host: 'host.docker.internal',
+  host: 'mysqldb',
   user: 'root',
   password: 'example',
   database: 'shopdb'
