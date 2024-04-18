@@ -1,3 +1,4 @@
+<?ob_start();?>
 <?php
     // Include database connection file
     require '../db.php'; 

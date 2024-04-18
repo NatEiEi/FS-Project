@@ -1,3 +1,4 @@
+<?ob_start();?>
 <?php
     require '../db.php'; 
     require_once 'JWT_Handler_admin.php'; 

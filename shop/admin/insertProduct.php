@@ -1,3 +1,4 @@
+<?ob_start();?>
 <?php
     include __DIR__ . '/adminLogin.php';
 ?>

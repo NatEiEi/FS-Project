@@ -1,3 +1,4 @@
+<?ob_start();?>
 <?php
     require '../db.php'; 
     include __DIR__ . '/adminLogin.php';

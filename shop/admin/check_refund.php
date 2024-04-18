@@ -1,3 +1,4 @@
+<?ob_start();?>
 <?php
     $query = "SELECT *
             FROM order_refund_detail

@@ -1,3 +1,4 @@
+<?ob_start();?>
 <?php
 
     require_once '../libraries/jwt/vendor/autoload.php'; 

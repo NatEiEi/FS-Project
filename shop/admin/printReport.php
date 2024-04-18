@@ -1,3 +1,4 @@
+<?ob_start();?>
 <?php 
     require '../db.php';
     require ("../libraries/fpdf/fpdf.php");
