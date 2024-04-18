@@ -1,8 +1,9 @@
+<?ob_start();?>
 <?php
 $info = array(
-    'host' => 'localhost',
-    'user' => 'root',
-    'password' => '',
+    'host' => 'mysqldb',
+    'user' => 'admin',
+    'password' => 'example',
     'dbname' => 'thailand'
 );
 $conn = mysqli_connect($info['host'], $info['user'], $info['password'], $info['dbname']) or die('Error connection database!');

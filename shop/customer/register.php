@@ -3,16 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Password Policy Check</title>
+<title>Register</title>
 <style>
-    .error {
-        color: red;
-    }
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .container {
+    background-color: #f2f2f2;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    text-align: center; /* Center text within the container */
+  }
+
+  h2 {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="tel"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+  }
+
+  .error {
+    color: red;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center; /* Center error message horizontally */
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  ul li {
+    margin-bottom: 5px;
+  }
+
+  ul li span {
+    color: #ccc;
+    margin-right: 5px;
+  }
+
+  .progress-bar {
+    height: 10px;
+    background-color: #ddd;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background-color: green;
+    transition: width 0.5s ease-in-out;
+  }
+
+  #securityLevel1 {
+    margin-right: 10px;
+  }
+
+  /* Move the error message to the bottom and center it horizontally */
+  #error {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+  }
 </style>
 </head>
 <body>
 
-<h2>Register</h2>
 
 <form id="passwordForm">
     <label for="username">username:</label>

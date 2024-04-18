@@ -1,3 +1,4 @@
+<?ob_start();?>
 <?php
     session_start();
     if(isset($_SESSION['CartCount'])) {

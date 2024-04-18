@@ -1,3 +1,4 @@
+require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
 const mysql = require('mysql');
 const cors = require('cors');
@@ -5,15 +6,14 @@ const cors = require('cors');
 const app = express();
 const port = 5000;
 
-
 // Enable CORS
 app.use(cors());
 
 const connection = mysql.createConnection({
-  host: 'mysqldb',
-  user: 'root',
-  password: 'example',
-  database: 'shopdb'
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE
 });
 
 connection.connect((err) => {
@@ -33,7 +33,7 @@ connection.connect((err) => {
     });
   });
 
-  app.get('/api/data', (req, res) => {
+  app.get('/api/test', (req, res) => {
     connection.query(
         `SELECT * FROM product`,
         (err, results) => {
@@ -50,29 +50,26 @@ connection.connect((err) => {
 });
 
   
-//   app.get('/api/data', (req, res) => {
-//     const { startDate, endDate } = req.query;
-//     connection.query(
-//         `SELECT pl.ProductID , p.ProductName , p.PricePerUnit , p.Cost , SUM(Qty) as total_Qty
-//         FROM productlist pl , product p  
-//         WHERE pl.ProductID = p.ProductID 
-//         AND OrderID IN 
-//             (SELECT OrderID FROM \`order\` WHERE Status != '60' AND Status != '80' AND Date BETWEEN ? AND ?) 
-//         GROUP BY ProductID 
-//         ORDER BY ProductID`,
-//         [startDate, endDate],
-//         (err, results) => {
-//             if (err) {
-//                 console.error('Error fetching data from MySQL:', err);
-//                 res.status(500).json({ error: 'Internal server error' });
-//                 return;
-//             }
-//             // console.log('Data from MySQL Database:');
-//             // console.log(results);
-  
-//             res.json(results);
-//         });
-// });
+  app.get('/api/data', (req, res) => {
+    const { startDate, endDate } = req.query;
+    connection.query(
+        `SELECT pl.ProductID , p.ProductName , p.PricePerUnit , p.Cost , SUM(Qty) as total_Qty
+        FROM productlist pl , product p  
+        WHERE pl.ProductID = p.ProductID 
+        AND OrderID IN 
+            (SELECT OrderID FROM \`order\` WHERE Status != '60' AND Status != '80' AND Date BETWEEN ? AND ?) 
+        GROUP BY ProductID 
+        ORDER BY ProductID`,
+        [startDate, endDate],
+        (err, results) => {
+            if (err) {
+                console.error('Error fetching data from MySQL:', err);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            res.json(results);
+        });
+});
 
 
 app.get('/api/cntOrder', (req, res) => {

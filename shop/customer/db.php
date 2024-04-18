@@ -1,6 +1,7 @@
+<?ob_start();?>
 <?php
     $host="mysqldb"; 
-    $user="root"; 
+    $user="admin"; 
     $password="example"; 
     $db="shopdb"; 
 

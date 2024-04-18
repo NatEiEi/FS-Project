@@ -1,3 +1,4 @@
+<?ob_start();?>
 <?php
     class counter {
 

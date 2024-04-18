@@ -1,3 +1,4 @@
+<?ob_start();?>
 <?php
     require '../db.php'; 
     $OrderID = $_GET["OrderID"];

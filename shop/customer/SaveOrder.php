@@ -1,3 +1,4 @@
+<?ob_start();?>
 <?php
     require_once __DIR__ . '/db.php'; 
     include __DIR__ . '/counter.php';

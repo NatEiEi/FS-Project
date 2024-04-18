@@ -1,3 +1,4 @@
+<?ob_start();?>
 <?php
     require_once __DIR__ . '/db.php'; 
     require_once 'JWT_Handler.php'; 
@@ -19,5 +20,5 @@
     unset($_SESSION['CartArray']);
     unset($_SESSION['CartCount']);
     session_destroy();
-    header('Location: home.php');
+    header('Location: Home.php');
 ?>

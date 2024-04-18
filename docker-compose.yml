@@ -95,22 +95,6 @@ services:
       - "3000:3000"
     command: npm run start
 
-  # nginx:
-  #   build:
-  #     context: ./nginx
-  #     dockerfile: ./nginx.Dockerfile
-  #   container_name: nginx
-  #   restart: always
-  #   tty: true
-  #   ports: 
-  #     - "80:80"
-  #   networks: 
-  #     - internalnet
-  #   depends_on:
-  #      - reactapp
-  #      - nodeapp
-  #      - phpapp
-
 networks:
   internalnet:
     driver: bridge

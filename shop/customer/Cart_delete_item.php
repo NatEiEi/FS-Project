@@ -1,3 +1,4 @@
+<?ob_start();?>
 <?php
     require_once __DIR__ . '/db.php'; 
     require_once 'JWT_Handler.php';
@@ -7,7 +8,7 @@
     if (isset($_COOKIE['JWT'])){
         $JWT = new JWT_Handler();
         $Username = $JWT->decode()->Username;  
-        $query = "DELETE FROM Cart WHERE ProductID = '$ProductID' AND Username = '$Username'";
+        $query = "DELETE FROM cart WHERE ProductID = '$ProductID' AND Username = '$Username'";
         $statement = $pdo->prepare($query);
         $statement->execute();
         $_SESSION['CartCount'] -= 1;

@@ -1,3 +1,4 @@
+<?ob_start();?>
 <?php 
     include('db_thailand.php');
     $sql = "SELECT * FROM provinces";

@@ -1,3 +1,4 @@
+<?ob_start();?>
 <?php
     require_once 'JWT_Handler.php'; 
     if(isset($_COOKIE['JWT'])) {
